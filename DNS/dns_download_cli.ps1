@@ -61,5 +61,5 @@ function DNS_Download {
 
 }
 
-#DNS_Download -Server tun.scrt.fr -Filename server
+#DNS_Download -Server tun.scrt.fr -Filename monfichier
 #DNS_Download -Server tun.scrt.fr -Filename monfichier -Size 45000 -FilenameDestination monfichier_copie -DNS server.fr
