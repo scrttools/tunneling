@@ -58,4 +58,4 @@ function Icmp_Download
     }
 }
 
-#Icmp_Download -IPAddress <destination IP address> -filename <filename>
+#Icmp_Download -IPAddress <destination IP address> -Filename <Filename>
