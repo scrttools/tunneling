@@ -1,5 +1,5 @@
 # Tunneling
-ICMP and DNS tunneling to use during penetration testing
+ICMP tunneling to use during penetration testing
 
 # ICMP Shell tunneling
 
