@@ -50,8 +50,11 @@ def main(src, dst):
                 offset = dataUnpacked[0]
                 size = dataUnpacked[1]
                 sys.stdout.write("Filename : " + filename + "\nOffset : " + str(offset) + "\n")
-
-                f = open(filename)
+                try:
+                    f = open(filename)
+                except:
+                    print "%s not found"%filename
+                    continue
                 f.seek(offset)
                 line = f.read(size)
                 f.close()

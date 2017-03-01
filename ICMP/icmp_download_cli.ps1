@@ -57,7 +57,7 @@ function Icmp_Download
     {
       write-host -NoNewline "-"
       $try += 1
-      if ($try > 5)
+      if ($try -gt 5)
       {
         echo ""
         echo "Server seems down"
